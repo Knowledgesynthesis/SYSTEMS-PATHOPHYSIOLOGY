@@ -50,6 +50,22 @@ export default function OrganMatrix() {
         </p>
       </div>
 
+      {/* How to Use */}
+      <Card className="bg-primary/5 border-primary/20">
+        <CardContent className="pt-6">
+          <div className="space-y-2 text-sm">
+            <p className="font-semibold">Interactive Dashboard:</p>
+            <ul className="space-y-1 text-xs ml-4">
+              <li>• <strong>Adjust sliders</strong> to manually change parameters (PaO₂, MAP, Creatinine, Platelets, etc.)</li>
+              <li>• Click <strong>Run</strong> to see how changes propagate across organ systems automatically</li>
+              <li>• Watch how <strong>lowering cardiac output</strong> worsens kidney function and causes lactic acidosis</li>
+              <li>• See how <strong>decreasing platelets/fibrinogen</strong> affects coagulation scores and organ perfusion</li>
+              <li>• All parameters update based on physiologically accurate propagation rules</li>
+            </ul>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Controls */}
       <Card>
         <CardContent className="pt-6">
@@ -226,26 +242,43 @@ export default function OrganMatrix() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="space-y-3 text-xs">
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Creatinine:</span>
-                <span className={`font-mono ${currentState.organs[OrganSystem.KIDNEYS].parameters.creatinine > 1.5 ? 'text-red-500' : ''}`}>
-                  {currentState.organs[OrganSystem.KIDNEYS].parameters.creatinine.toFixed(1)} mg/dL
-                </span>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span>Creatinine: {currentState.organs[OrganSystem.KIDNEYS].parameters.creatinine.toFixed(1)} mg/dL</span>
+                  <span className="text-xs text-muted-foreground">Normal: 0.7-1.3</span>
+                </div>
+                <Slider
+                  min={0.5}
+                  max={8}
+                  step={0.1}
+                  value={currentState.organs[OrganSystem.KIDNEYS].parameters.creatinine}
+                  onValueChange={(val) => updateOrganParameter(OrganSystem.KIDNEYS, 'creatinine', val)}
+                  disabled={isSimulationRunning}
+                />
               </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">BUN:</span>
-                <span className="font-mono">{currentState.organs[OrganSystem.KIDNEYS].parameters.bun.toFixed(0)} mg/dL</span>
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span>Urine Output: {currentState.organs[OrganSystem.KIDNEYS].parameters.urineOutput.toFixed(0)} mL/hr</span>
+                  <span className="text-xs text-muted-foreground">Normal: &gt;30</span>
+                </div>
+                <Slider
+                  min={0}
+                  max={100}
+                  value={currentState.organs[OrganSystem.KIDNEYS].parameters.urineOutput}
+                  onValueChange={(val) => updateOrganParameter(OrganSystem.KIDNEYS, 'urineOutput', val)}
+                  disabled={isSimulationRunning}
+                />
               </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Urine Output:</span>
-                <span className={`font-mono ${currentState.organs[OrganSystem.KIDNEYS].parameters.urineOutput < 30 ? 'text-red-500' : ''}`}>
-                  {currentState.organs[OrganSystem.KIDNEYS].parameters.urineOutput.toFixed(0)} mL/hr
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">GFR:</span>
-                <span className="font-mono">{currentState.organs[OrganSystem.KIDNEYS].parameters.gfr.toFixed(0)} mL/min</span>
+              <div className="text-xs space-y-1">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">GFR:</span>
+                  <span className="font-mono">{currentState.organs[OrganSystem.KIDNEYS].parameters.gfr.toFixed(0)} mL/min</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">BUN:</span>
+                  <span className="font-mono">{currentState.organs[OrganSystem.KIDNEYS].parameters.bun.toFixed(0)} mg/dL</span>
+                </div>
               </div>
             </div>
           </CardContent>
@@ -310,26 +343,44 @@ export default function OrganMatrix() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="space-y-3 text-xs">
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Platelets:</span>
-                <span className={`font-mono ${currentState.organs[OrganSystem.COAGULATION].parameters.platelets < 100 ? 'text-red-500' : ''}`}>
-                  {currentState.organs[OrganSystem.COAGULATION].parameters.platelets.toFixed(0)} ×10³/μL
-                </span>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span>Platelets: {currentState.organs[OrganSystem.COAGULATION].parameters.platelets.toFixed(0)} ×10³/μL</span>
+                  <span className="text-xs text-muted-foreground">Normal: 150-400</span>
+                </div>
+                <Slider
+                  min={20}
+                  max={400}
+                  value={currentState.organs[OrganSystem.COAGULATION].parameters.platelets}
+                  onValueChange={(val) => updateOrganParameter(OrganSystem.COAGULATION, 'platelets', val)}
+                  disabled={isSimulationRunning}
+                />
               </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">INR:</span>
-                <span className="font-mono">{currentState.organs[OrganSystem.COAGULATION].parameters.inr.toFixed(1)}</span>
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span>Fibrinogen: {currentState.organs[OrganSystem.COAGULATION].parameters.fibrinogen.toFixed(0)} mg/dL</span>
+                  <span className="text-xs text-muted-foreground">Normal: 200-400</span>
+                </div>
+                <Slider
+                  min={50}
+                  max={500}
+                  value={currentState.organs[OrganSystem.COAGULATION].parameters.fibrinogen}
+                  onValueChange={(val) => updateOrganParameter(OrganSystem.COAGULATION, 'fibrinogen', val)}
+                  disabled={isSimulationRunning}
+                />
               </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Fibrinogen:</span>
-                <span className="font-mono">{currentState.organs[OrganSystem.COAGULATION].parameters.fibrinogen.toFixed(0)} mg/dL</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">DIC Score:</span>
-                <span className={`font-mono ${currentState.organs[OrganSystem.COAGULATION].parameters.dicScore >= 5 ? 'text-red-500' : ''}`}>
-                  {currentState.organs[OrganSystem.COAGULATION].parameters.dicScore.toFixed(0)} / 8
-                </span>
+              <div className="text-xs space-y-1">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">INR:</span>
+                  <span className="font-mono">{currentState.organs[OrganSystem.COAGULATION].parameters.inr.toFixed(1)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">DIC Score:</span>
+                  <span className={`font-mono ${currentState.organs[OrganSystem.COAGULATION].parameters.dicScore >= 5 ? 'text-red-500' : ''}`}>
+                    {currentState.organs[OrganSystem.COAGULATION].parameters.dicScore.toFixed(0)} / 8
+                  </span>
+                </div>
               </div>
             </div>
           </CardContent>
