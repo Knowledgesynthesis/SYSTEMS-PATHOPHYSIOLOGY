@@ -36,6 +36,7 @@ interface AppState {
   setSimulationRunning: (running: boolean) => void;
   setSimulationSpeed: (speed: number) => void;
   updateOrganParameter: (organ: OrganSystem, parameter: string, value: number) => void;
+  updateSystemicParameter: (parameter: string, value: number) => void;
 
   setCurrentModule: (moduleId: string | null) => void;
   setCurrentCase: (caseScenario: CaseScenario | null) => void;
@@ -102,6 +103,16 @@ export const useStore = create<AppState>()(
         if (newState.organs[organKey]) {
           (newState.organs[organKey].parameters as any)[parameter] = value;
         }
+        set({ currentState: newState });
+      },
+
+      // Update a systemic parameter
+      updateSystemicParameter: (parameter: string, value: number) => {
+        const { currentState } = get();
+        if (!currentState) return;
+
+        const newState = { ...currentState };
+        (newState.systemicParameters as any)[parameter] = value;
         set({ currentState: newState });
       },
 
