@@ -229,6 +229,22 @@ export default function PropagationGraph() {
         </p>
       </div>
 
+      {/* How to Use */}
+      <Card className="bg-primary/5 border-primary/20">
+        <CardContent className="pt-6">
+          <div className="space-y-2 text-sm">
+            <p className="font-semibold">How to use this interactive graph:</p>
+            <ul className="space-y-1 text-xs ml-4">
+              <li>• Click <strong>Run Simulation</strong> to watch organs deteriorate over time</li>
+              <li>• <strong>Arrows appear</strong> when one organ's dysfunction affects another (e.g., low cardiac output → kidney injury)</li>
+              <li>• <strong>Node colors change</strong> from normal (blue/green) → mild (yellow) → severe (orange) → critical (red)</li>
+              <li>• <strong>Click any organ</strong> to see detailed parameters, severity, and compensatory mechanisms</li>
+              <li>• Watch how sepsis progresses: Heart dysfunction → Lung injury (ARDS) → Kidney failure (AKI) → Coagulation problems (DIC)</li>
+            </ul>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Controls */}
       <Card>
         <CardContent className="pt-6">

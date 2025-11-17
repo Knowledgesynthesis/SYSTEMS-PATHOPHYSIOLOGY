@@ -147,21 +147,47 @@ export class PhysiologySimulator {
       const propagationEffect = (sourceOrgan.severity / 5) * rule.strength;
 
       // Only propagate if source is dysfunctional
-      if (sourceOrgan.severity >= 2) {
-        // Increase target organ severity (max 5)
+      if (sourceOrgan.severity >= 1) {
+        // More aggressive severity progression for visibility
+        const baseSeverityIncrease = propagationEffect * this.timeStep * 0.15; // Increased from implicit smaller value
+
+        // Exponential worsening if source is very severe
+        const exponentialFactor = sourceOrgan.severity >= 3 ? 1.5 : 1.0;
+
         const severityIncrease = Math.min(
-          propagationEffect * this.timeStep,
+          baseSeverityIncrease * exponentialFactor,
           5 - targetOrgan.severity
         );
 
-        targetOrgan.severity = Math.min(
-          5,
-          targetOrgan.severity + severityIncrease
-        ) as OrganSeverity;
+        if (severityIncrease > 0) {
+          targetOrgan.severity = Math.min(
+            5,
+            targetOrgan.severity + severityIncrease
+          ) as OrganSeverity;
+
+          // Update description based on severity
+          this.updateOrganDescription(targetOrgan);
+        }
 
         // Update specific parameters based on the mechanism
         this.applyMechanismEffects(rule, state);
       }
+    }
+  }
+
+  /**
+   * Update organ description based on current severity
+   */
+  private updateOrganDescription(organ: any): void {
+    if (organ.severity >= 4) {
+      organ.description = 'Critical organ dysfunction';
+      organ.clinicalSigns = [...organ.clinicalSigns, 'Critical deterioration'];
+    } else if (organ.severity >= 3) {
+      organ.description = 'Severe organ dysfunction';
+    } else if (organ.severity >= 2) {
+      organ.description = 'Moderate organ dysfunction';
+    } else if (organ.severity >= 1) {
+      organ.description = 'Mild organ dysfunction';
     }
   }
 

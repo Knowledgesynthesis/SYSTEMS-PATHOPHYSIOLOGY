@@ -70,10 +70,21 @@ export default function TimelineSimulator() {
       {/* Preset Scenarios */}
       <Card>
         <CardHeader>
-          <CardTitle>Select Scenario</CardTitle>
-          <CardDescription>Choose a clinical scenario to simulate</CardDescription>
+          <CardTitle>Select Clinical Scenario</CardTitle>
+          <CardDescription>
+            Each scenario starts with different organ dysfunctions. Press "Run" to watch how organs cascade and deteriorate over time.
+          </CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4">
+          <div className="p-4 bg-primary/10 border border-primary/20 rounded-lg text-sm">
+            <p className="font-semibold mb-2">How it works:</p>
+            <ul className="space-y-1 text-xs">
+              <li>• <strong>Normal Baseline:</strong> All organs healthy - use for experimentation</li>
+              <li>• <strong>Early Sepsis:</strong> Tachycardia, hypotension, mild hypoxemia - watch progression to ARDS/AKI</li>
+              <li>• <strong>Advanced Sepsis:</strong> Already has ARDS + AKI + early DIC - see multi-organ failure cascade</li>
+              <li>• <strong>Cardiogenic Shock:</strong> Severe cardiac dysfunction - watch heart → lungs → kidneys → liver propagation</li>
+            </ul>
+          </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
             <Button
               variant={selectedPreset === 'normal' ? 'default' : 'outline'}
