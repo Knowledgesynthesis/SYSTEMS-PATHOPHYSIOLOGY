@@ -15,7 +15,8 @@ export default function OrganMatrix() {
     stepSimulation,
     resetSimulation,
     initializeSimulation,
-    updateOrganParameter
+    updateOrganParameter,
+    updateSystemicParameter
   } = useStore();
 
   useEffect(() => {
@@ -56,10 +57,11 @@ export default function OrganMatrix() {
           <div className="space-y-2 text-sm">
             <p className="font-semibold">Interactive Dashboard:</p>
             <ul className="space-y-1 text-xs ml-4">
-              <li>• <strong>Adjust sliders</strong> to manually change parameters (PaO₂, MAP, Creatinine, Platelets, etc.)</li>
+              <li>• <strong>Adjust sliders</strong> to manually change parameters (PaO₂, MAP, Creatinine, Platelets, Bilirubin, Lactate, etc.)</li>
               <li>• Click <strong>Run</strong> to see how changes propagate across organ systems automatically</li>
               <li>• Watch how <strong>lowering cardiac output</strong> worsens kidney function and causes lactic acidosis</li>
-              <li>• See how <strong>decreasing platelets/fibrinogen</strong> affects coagulation scores and organ perfusion</li>
+              <li>• See how <strong>increasing lactate/lowering pH</strong> affects organ perfusion and severity scores</li>
+              <li>• Observe how <strong>liver dysfunction (↑Bilirubin, ↑ALT)</strong> impacts coagulation and systemic inflammation</li>
               <li>• All parameters update based on physiologically accurate propagation rules</li>
             </ul>
           </div>
@@ -303,22 +305,43 @@ export default function OrganMatrix() {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="space-y-3 text-xs">
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Bilirubin:</span>
-                <span className="font-mono">{currentState.organs[OrganSystem.LIVER].parameters.bilirubin.toFixed(1)} mg/dL</span>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span>Bilirubin: {currentState.organs[OrganSystem.LIVER].parameters.bilirubin.toFixed(1)} mg/dL</span>
+                  <span className="text-xs text-muted-foreground">Normal: 0.3-1.2</span>
+                </div>
+                <Slider
+                  min={0.3}
+                  max={20}
+                  step={0.1}
+                  value={currentState.organs[OrganSystem.LIVER].parameters.bilirubin}
+                  onValueChange={(val) => updateOrganParameter(OrganSystem.LIVER, 'bilirubin', val)}
+                  disabled={isSimulationRunning}
+                />
               </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">ALT:</span>
-                <span className="font-mono">{currentState.organs[OrganSystem.LIVER].parameters.alt.toFixed(0)} U/L</span>
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span>ALT: {currentState.organs[OrganSystem.LIVER].parameters.alt.toFixed(0)} U/L</span>
+                  <span className="text-xs text-muted-foreground">Normal: 7-56</span>
+                </div>
+                <Slider
+                  min={10}
+                  max={2000}
+                  value={currentState.organs[OrganSystem.LIVER].parameters.alt}
+                  onValueChange={(val) => updateOrganParameter(OrganSystem.LIVER, 'alt', val)}
+                  disabled={isSimulationRunning}
+                />
               </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">INR:</span>
-                <span className="font-mono">{currentState.organs[OrganSystem.LIVER].parameters.inr.toFixed(1)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Albumin:</span>
-                <span className="font-mono">{currentState.organs[OrganSystem.LIVER].parameters.albumin.toFixed(1)} g/dL</span>
+              <div className="text-xs space-y-1">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">INR:</span>
+                  <span className="font-mono">{currentState.organs[OrganSystem.LIVER].parameters.inr.toFixed(1)}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Albumin:</span>
+                  <span className="font-mono">{currentState.organs[OrganSystem.LIVER].parameters.albumin.toFixed(1)} g/dL</span>
+                </div>
               </div>
             </div>
           </CardContent>
@@ -392,26 +415,58 @@ export default function OrganMatrix() {
             <CardTitle className="text-lg">Systemic Parameters</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-3 text-xs">
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Lactate:</span>
-                <span className={`font-mono ${currentState.systemicParameters.lactate > 4 ? 'text-red-500' : ''}`}>
-                  {currentState.systemicParameters.lactate.toFixed(1)} mmol/L
-                </span>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span>Lactate: {currentState.systemicParameters.lactate.toFixed(1)} mmol/L</span>
+                  <span className="text-xs text-muted-foreground">Normal: 0.5-2.2</span>
+                </div>
+                <Slider
+                  min={0.5}
+                  max={15}
+                  step={0.1}
+                  value={currentState.systemicParameters.lactate}
+                  onValueChange={(val) => updateSystemicParameter('lactate', val)}
+                  disabled={isSimulationRunning}
+                />
               </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">pH:</span>
-                <span className={`font-mono ${currentState.systemicParameters.pH < 7.3 ? 'text-red-500' : ''}`}>
-                  {currentState.systemicParameters.pH.toFixed(2)}
-                </span>
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span>Temperature: {currentState.systemicParameters.temperature.toFixed(1)}°C</span>
+                  <span className="text-xs text-muted-foreground">Normal: 36-37.5</span>
+                </div>
+                <Slider
+                  min={35}
+                  max={42}
+                  step={0.1}
+                  value={currentState.systemicParameters.temperature}
+                  onValueChange={(val) => updateSystemicParameter('temperature', val)}
+                  disabled={isSimulationRunning}
+                />
               </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Temperature:</span>
-                <span className="font-mono">{currentState.systemicParameters.temperature.toFixed(1)}°C</span>
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span>pH: {currentState.systemicParameters.pH.toFixed(2)}</span>
+                  <span className="text-xs text-muted-foreground">Normal: 7.35-7.45</span>
+                </div>
+                <Slider
+                  min={6.8}
+                  max={7.8}
+                  step={0.01}
+                  value={currentState.systemicParameters.pH}
+                  onValueChange={(val) => updateSystemicParameter('pH', val)}
+                  disabled={isSimulationRunning}
+                />
               </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Inflammation:</span>
-                <span className="font-mono">{currentState.systemicParameters.inflammation.toFixed(1)} / 10</span>
+              <div className="text-xs space-y-1">
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Inflammation:</span>
+                  <span className="font-mono">{currentState.systemicParameters.inflammation.toFixed(1)} / 10</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-muted-foreground">Glucose:</span>
+                  <span className="font-mono">{currentState.systemicParameters.glucose.toFixed(0)} mg/dL</span>
+                </div>
               </div>
             </div>
           </CardContent>
